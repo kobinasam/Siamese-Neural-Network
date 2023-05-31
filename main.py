@@ -1,3 +1,9 @@
+# THIS IS IMPORTANT TO ACHEIVE REPRODUCIBILITY WITH TENSORFLOW. MUST HAPPEN BEFORE TENSORFLOW IMPORT
+import os
+
+# SHOULD HAVE THIS ENVIRONMENT VARIABLE SET BEFORE PYTHON EVEN BEGINS EXECUTION
+os.environ['PYTHONHASHSEED']=str(1)
+
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -11,7 +17,6 @@ from sklearn.metrics.pairwise import pairwise_distances
 
 # Prepare the labeled dataset
 data = pd.read_csv('./data/train.csv')
-#data = [[-8.618643,41.141412],[-8.618499,41.141376],[-8.620326,41.14251],[-8.622153,41.143815],[-8.623953,41.144373],[-8.62668,41.144778],[-8.627373,41.144697],[-8.630226,41.14521],[-8.632746,41.14692],[-8.631738,41.148225],[-8.629938,41.150385],[-8.62911,41.151213],[-8.629128,41.15124],[-8.628786,41.152203],[-8.628687,41.152374],[-8.628759,41.152518],[-8.630838,41.15268],[-8.632323,41.153022],[-8.631144,41.154489],[-8.630829,41.154507],[-8.630829,41.154516],[-8.630829,41.154498],[-8.630838,41.154489]]
 X_train = np.array(data.POLYLINE)
 # Generating paris for similar and dissimilar
 # Cluster-based Labeling and we need to create 2 Clusters
