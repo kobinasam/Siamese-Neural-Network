@@ -1,4 +1,4 @@
-# THIS IS IMPORTANT TO ACHEIVE REPRODUCIBILITY WITH TENSORFLOW. MUST HAPPEN BEFORE TENSORFLOW IMPORT
+# THIS IS IMPORTANT TO ACHIEVE REPRODUCIBILITY WITH TENSORFLOW. MUST HAPPEN BEFORE TENSORFLOW IMPORT
 import os
 
 # SHOULD HAVE THIS ENVIRONMENT VARIABLE SET BEFORE PYTHON EVEN BEGINS EXECUTION
@@ -10,13 +10,11 @@ import tensorflow as tf
 from keras import Input, Model
 from keras.layers import Dense
 from tensorflow import keras
-
-
 from sklearn.cluster import KMeans
 from sklearn.metrics.pairwise import pairwise_distances
 
 # Prepare the labeled dataset
-data = pd.read_csv('./data/train.csv')
+data = pd.read_csv('./data/testdata.csv')
 X_train = np.array(data.POLYLINE)
 # Generating paris for similar and dissimilar
 # Cluster-based Labeling and we need to create 2 Clusters
@@ -50,7 +48,7 @@ for i in range(num_clusters):
 
 y_train = y_labels
 
-# 4. Create the Siamese network model
+# Create the Siamese network model
 def create_siamese_model(input_shape):
     input_a = Input(shape=input_shape)
     input_b = Input(shape=input_shape)
@@ -71,19 +69,21 @@ def create_siamese_model(input_shape):
     model = Model(inputs=[input_a, input_b], outputs=similarity)
     return model
 
-# Create the Siamese network model
-input_shape = X_train.shape[1:]  # Update with the appropriate shape of trajectory features
+
+input_shape = X_train.shape[1:]
 siamese_model = create_siamese_model(input_shape)
 print(siamese_model)
 
-# 5. Train the model
+# Train the model
 siamese_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 siamese_model.fit([X_pairs[:, 0], X_pairs[:, 1]], y_labels, epochs=10, batch_size=32)
 
-# 6. Use the trained model to predict similarity
+
+# Use the trained model to predict similarity
 def predict_similarity(model, trajectory_a, trajectory_b):
     similarity_score = model.predict([[trajectory_a], [trajectory_b]])
     return similarity_score[0][0]
+
 
 # Here we pass the test data for both trajectories
 trajectory1 = []
