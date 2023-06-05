@@ -14,8 +14,8 @@ from sklearn.cluster import KMeans
 from sklearn.metrics.pairwise import pairwise_distances
 
 # Prepare the labeled dataset
-data = pd.read_csv('./data/testdata.csv')
-X_train = np.array(data.POLYLINE)
+data = pd.read_csv('./data/train.csv')
+X_train = np.array(data)
 # Generating paris for similar and dissimilar
 # Cluster-based Labeling and we need to create 2 Clusters
 num_clusters = 2
@@ -48,15 +48,16 @@ for i in range(num_clusters):
 
 y_train = y_labels
 
+
 # Create the Siamese network model
 def create_siamese_model(input_shape):
     input_a = Input(shape=input_shape)
     input_b = Input(shape=input_shape)
 
-    shared_network = tf.keras.Sequential([
-        Dense(128, activation='relu'),
-        Dense(64, activation='relu'),
-        Dense(32, activation='relu')
+    shared_network = keras.Sequential([
+        keras.layers.Dense(128, activation='relu'),
+        keras.layers.Dense(64, activation='relu'),
+        keras.layers.Dense(32, activation='relu')
     ])
 
     output_a = shared_network(input_a)
@@ -73,20 +74,20 @@ def create_siamese_model(input_shape):
 input_shape = X_train.shape[1:]
 siamese_model = create_siamese_model(input_shape)
 print(siamese_model)
-
-# Train the model
-siamese_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-siamese_model.fit([X_pairs[:, 0], X_pairs[:, 1]], y_labels, epochs=10, batch_size=32)
-
-
-# Use the trained model to predict similarity
-def predict_similarity(model, trajectory_a, trajectory_b):
-    similarity_score = model.predict([[trajectory_a], [trajectory_b]])
-    return similarity_score[0][0]
-
-
-# Here we pass the test data for both trajectories
-trajectory1 = []
-trajectory2 = []
-similarity_score = predict_similarity(siamese_model, trajectory1, trajectory2)
-print(f"Similarity Score: {similarity_score}")
+#
+# # Train the model
+# siamese_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+# siamese_model.fit([X_pairs[:, 0], X_pairs[:, 1]], y_labels, epochs=10, batch_size=32)
+#
+#
+# # Use the trained model to predict similarity
+# def predict_similarity(model, trajectory_a, trajectory_b):
+#     similarity_score = model.predict([[trajectory_a], [trajectory_b]])
+#     return similarity_score[0][0]
+#
+#
+# # Here we pass the test data for both trajectories
+# trajectory1 = []
+# trajectory2 = []
+# similarity_score = predict_similarity(siamese_model, trajectory1, trajectory2)
+# print(f"Similarity Score: {similarity_score}")
