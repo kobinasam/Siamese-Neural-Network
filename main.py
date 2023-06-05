@@ -73,21 +73,21 @@ def create_siamese_model(input_shape):
 
 input_shape = X_train.shape[1:]
 siamese_model = create_siamese_model(input_shape)
-print(siamese_model)
-#
-# # Train the model
-# siamese_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-# siamese_model.fit([X_pairs[:, 0], X_pairs[:, 1]], y_labels, epochs=10, batch_size=32)
-#
-#
-# # Use the trained model to predict similarity
-# def predict_similarity(model, trajectory_a, trajectory_b):
-#     similarity_score = model.predict([[trajectory_a], [trajectory_b]])
-#     return similarity_score[0][0]
-#
-#
-# # Here we pass the test data for both trajectories
-# trajectory1 = []
-# trajectory2 = []
-# similarity_score = predict_similarity(siamese_model, trajectory1, trajectory2)
-# print(f"Similarity Score: {similarity_score}")
+
+
+# Train the model
+siamese_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+siamese_model.fit([X_pairs[:, 0], X_pairs[:, 1]], y_labels, epochs=10, batch_size=32)
+
+
+# Use the trained model to predict similarity
+def predict_similarity(model, trajectory_a, trajectory_b):
+    similarity_score = model.predict([[trajectory_a], [trajectory_b]])
+    return similarity_score[0][0]
+
+
+# Here we pass the test data for both trajectories
+trajectory1 = []
+trajectory2 = []
+similarity_score = predict_similarity(siamese_model, trajectory1, trajectory2)
+print(f"Similarity Score: {similarity_score}")
