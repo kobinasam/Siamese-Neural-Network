@@ -7,17 +7,20 @@ os.environ['PYTHONHASHSEED']=str(1)
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+from tensorflow import keras
 from keras import Input, Model
 from keras.layers import Dense
-from tensorflow import keras
 from sklearn.cluster import KMeans
 from sklearn.metrics.pairwise import pairwise_distances
+from keras.models import Sequential
+from keras.layers import Dense, Input
+from keras.layers import Lambda
 
 # Prepare the labeled dataset
-data = pd.read_csv('./data/train.csv')
+data = pd.read_csv('./data/train/train.csv')
 X_train = np.array(data)
 # Generating paris for similar and dissimilar
-# Cluster-based Labeling and we need to create 2 Clusters
+# Cluster-based Labeling, and we need to create 2 Clusters
 num_clusters = 2
 kmeans = KMeans(n_clusters=num_clusters)
 cluster_labels = kmeans.fit_predict(X_train)
@@ -48,23 +51,22 @@ for i in range(num_clusters):
 
 y_train = y_labels
 
-
 # Create the Siamese network model
 def create_siamese_model(input_shape):
     input_a = Input(shape=input_shape)
     input_b = Input(shape=input_shape)
 
-    shared_network = keras.Sequential([
-        keras.layers.Dense(128, activation='relu'),
-        keras.layers.Dense(64, activation='relu'),
-        keras.layers.Dense(32, activation='relu')
+    shared_network = Sequential([
+        Dense(128, activation='relu'),
+        Dense(64, activation='relu'),
+        Dense(32, activation='relu')
     ])
 
     output_a = shared_network(input_a)
     output_b = shared_network(input_b)
 
     # Define a distance metric layer to compute the similarity
-    distance = tf.keras.layers.Lambda(lambda x: tf.norm(x[0] - x[1], axis=1, keepdims=True))
+    distance = Lambda(lambda x: tf.norm(x[0] - x[1], axis=1, keepdims=True))
     similarity = distance([output_a, output_b])
 
     model = Model(inputs=[input_a, input_b], outputs=similarity)
@@ -73,9 +75,9 @@ def create_siamese_model(input_shape):
 
 input_shape = X_train.shape[1:]
 siamese_model = create_siamese_model(input_shape)
-
-
-# Train the model
+# print(siamese_model.summary())
+#
+# # Train the model
 siamese_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 siamese_model.fit([X_pairs[:, 0], X_pairs[:, 1]], y_labels, epochs=10, batch_size=32)
 
@@ -87,7 +89,7 @@ def predict_similarity(model, trajectory_a, trajectory_b):
 
 
 # Here we pass the test data for both trajectories
-trajectory1 = []
-trajectory2 = []
+trajectory1 = pd.read_csv('./data/test/test1.csv')
+trajectory2 = pd.read_csv('./data/test/test2.csv')
 similarity_score = predict_similarity(siamese_model, trajectory1, trajectory2)
 print(f"Similarity Score: {similarity_score}")
